@@ -11,6 +11,7 @@ func _process(_delta):
 	_clean_list();
 	_update_distances();
 	_sort_candidates();
+	_set_target();
 
 func _ready() -> void:
 	_area.body_entered.connect(_register_candidate);
@@ -28,8 +29,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
 		interaction_index = 0;
 	
-	if (interaction_index > -1 and not _candidates.is_empty()):
-		_candidates[0].interact(interaction_index);
+	if (interaction_index > -1 and target != null):
+		target.interact(interaction_index);
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = [];
@@ -83,8 +84,21 @@ func _sort_candidates():
 			return a.distance < b.distance;
 	);
 	
-func _set_target(newTarget: InteractionCandidate):
-	target.stop_being_target();
-	newTarget.start_being_target();
+func _set_target():
+	var hasCandidates = _candidates.size() > 0;
+	var hasCurrentTarget = target != null;
 	
-	target = newTarget;
+	if (hasCandidates):
+		var firstCandidate = _candidates[0];
+		var notAlreadyTarget = firstCandidate != target
+		
+		if(notAlreadyTarget):
+			if (hasCurrentTarget):
+				target.stop_being_target();
+			
+			firstCandidate.start_being_target();
+			target = firstCandidate;
+			
+	elif (hasCurrentTarget):
+		target.stop_being_target();
+		target = null;

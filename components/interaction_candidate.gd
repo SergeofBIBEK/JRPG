@@ -12,10 +12,10 @@ func update_distance(newDistance: float):
 	distance = newDistance;
 
 func start_being_target():
-	pass;
+	node.display_prompts();
 	
 func stop_being_target():
-	pass;
+	node.clear_prompts();
 
 func interact(interaction_index: int):
 	node.handle_interaction(interaction_index);
