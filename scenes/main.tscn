@@ -11,17 +11,19 @@
 [ext_resource type="Script" uid="uid://dt6qf2frkh2w3" path="res://scenes/interaction_prompt.gd" id="9_85g3d"]
 [ext_resource type="Script" uid="uid://0dfthb7bg7q0" path="res://components/interaction_behaviors/dialog_behavior.gd" id="9_choun"]
 [ext_resource type="Script" uid="uid://bead2mudseie8" path="res://scenes/dialog_window.gd" id="11_ya4ey"]
+[ext_resource type="Script" uid="uid://cbp76lvd4ua5w" path="res://components/transition_manager.gd" id="12_a8y0u"]
+[ext_resource type="Script" uid="uid://vbr6ykxo100a" path="res://components/transition_trigger.gd" id="13_jkv2x"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tefeu"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_muem4"]
 texture = ExtResource("3_jyhfs")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_o6xl0"]
 tile_size = Vector2i(32, 32)
-sources/0 = SubResource("TileSetAtlasSource_tefeu")
+sources/0 = SubResource("TileSetAtlasSource_muem4")
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tipki"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_dp3eg"]
 texture = ExtResource("4_tbgi4")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
@@ -57,9 +59,9 @@ texture_region_size = Vector2i(32, 32)
 [sub_resource type="TileSet" id="TileSet_85g3d"]
 tile_size = Vector2i(32, 32)
 physics_layer_0/collision_layer = 1
-sources/0 = SubResource("TileSetAtlasSource_tipki")
+sources/0 = SubResource("TileSetAtlasSource_dp3eg")
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_o6xl0"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0ld40"]
 texture = ExtResource("5_tbgi4")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
@@ -69,7 +71,7 @@ texture_region_size = Vector2i(32, 32)
 [sub_resource type="TileSet" id="TileSet_tipki"]
 tile_size = Vector2i(32, 32)
 physics_layer_0/collision_layer = 1
-sources/1 = SubResource("TileSetAtlasSource_o6xl0")
+sources/1 = SubResource("TileSetAtlasSource_0ld40")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o6xl0"]
 size = Vector2(32, 32)
@@ -88,6 +90,9 @@ corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 shadow_color = Color(0, 0, 0, 0.47058824)
 shadow_size = 4
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gqmmt"]
+size = Vector2(63, 15)
 
 [node name="Map" type="Node2D" unique_id=664920413]
 script = ExtResource("1_sugp2")
@@ -208,3 +213,17 @@ layout_mode = 2
 [node name="DialogText" type="RichTextLabel" parent="CanvasLayer/DialogWindow/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1490700751]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="TransitionManager" type="Node" parent="." unique_id=769578140]
+script = ExtResource("12_a8y0u")
+fade_duration = 0.5
+
+[node name="TransitionTrigger" type="Area2D" parent="TransitionManager" unique_id=989166643]
+position = Vector2(320, 348)
+script = ExtResource("13_jkv2x")
+target_scene_path = "uid://d4dt7wou02sa7"
+spawn_location = "PlayerSpawn"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TransitionManager/TransitionTrigger" unique_id=2125144200]
+position = Vector2(-0.5, 4.5)
+shape = SubResource("RectangleShape2D_gqmmt")
