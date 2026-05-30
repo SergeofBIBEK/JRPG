@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://bead2mudseie8" path="res://scenes/dialog_window.gd" id="11_ya4ey"]
 [ext_resource type="Script" uid="uid://cbp76lvd4ua5w" path="res://components/transition_manager.gd" id="12_a8y0u"]
 [ext_resource type="Script" uid="uid://vbr6ykxo100a" path="res://components/transition_trigger.gd" id="13_jkv2x"]
+[ext_resource type="PackedScene" path="res://components/menu/menu_root.tscn" id="14_menu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_muem4"]
 texture = ExtResource("3_jyhfs")
@@ -93,6 +94,8 @@ shadow_size = 4
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gqmmt"]
 size = Vector2(63, 15)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trceg"]
 
 [node name="Map" type="Node2D" unique_id=664920413]
 script = ExtResource("1_sugp2")
@@ -227,3 +230,15 @@ spawn_location = "PlayerSpawn"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TransitionManager/TransitionTrigger" unique_id=2125144200]
 position = Vector2(-0.5, 4.5)
 shape = SubResource("RectangleShape2D_gqmmt")
+
+[node name="TransitionTrigger2" type="Area2D" parent="TransitionManager" unique_id=284442411]
+position = Vector2(175, 74)
+script = ExtResource("13_jkv2x")
+target_scene_path = "uid://d4dt7wou02sa7"
+spawn_location = "TheWindow"
+metadata/_custom_type_script = "uid://vbr6ykxo100a"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TransitionManager/TransitionTrigger2" unique_id=204347261]
+shape = SubResource("RectangleShape2D_trceg")
+
+[node name="MenuRoot" parent="." unique_id=1447286638 instance=ExtResource("14_menu")]

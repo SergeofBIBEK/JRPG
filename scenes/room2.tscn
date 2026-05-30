@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://0dfthb7bg7q0" path="res://components/interaction_behaviors/dialog_behavior.gd" id="10_oibp2"]
 [ext_resource type="Script" uid="uid://cbp76lvd4ua5w" path="res://components/transition_manager.gd" id="11_5wf3f"]
 [ext_resource type="Script" uid="uid://vbr6ykxo100a" path="res://components/transition_trigger.gd" id="12_dwq2r"]
+[ext_resource type="PackedScene" path="res://components/menu/menu_root.tscn" id="13_menu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_c7xmq"]
 texture = ExtResource("3_ucjjd")
@@ -222,3 +223,8 @@ spawn_location = "PlayerSpawn"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TransitionManager/TransitionTrigger" unique_id=450311343]
 position = Vector2(0, 5)
 shape = SubResource("RectangleShape2D_oibp2")
+
+[node name="TheWindow" type="Marker2D" parent="." unique_id=608292990]
+position = Vector2(176, 73)
+
+[node name="MenuRoot" parent="." instance=ExtResource("13_menu")]

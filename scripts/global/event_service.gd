@@ -8,4 +8,12 @@ signal hide_dialog();
 
 signal transition_requested(target_scene_path: String, spawn_location: String);
 
+signal menu_opened();
+signal menu_closed();
+
+signal menu_items_requested();
+signal menu_status_requested();
+signal menu_save_requested();
+signal menu_quit_requested();
+
 var pending_spawn_location: String = "";

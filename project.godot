@@ -18,6 +18,9 @@ config/icon="res://icon.svg"
 [autoload]
 
 Events="*uid://cx5868oc66dkn"
+ItemManager="*res://scripts/global/item_manager.gd"
+PartyManager="*res://scripts/global/party_manager.gd"
+SaveManager="*res://scripts/global/save_manager.gd"
 
 [display]
 
