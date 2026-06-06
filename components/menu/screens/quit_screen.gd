@@ -7,7 +7,7 @@ func _init() -> void:
 
 func activate() -> void:
 	super.activate();
-	print("[QuitScreen] Activated — emitting menu_quit_requested");
-	Events.menu_quit_requested.emit();
+
+func enter() -> void:
 	print("[QuitScreen] Quitting game...");
 	get_tree().quit();

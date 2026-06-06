@@ -6,6 +6,7 @@ var _menu_labels: Array[Label] = [];
 var _selected_index: int = 0;
 var _is_open: bool = false;
 var _active_screen: MenuScreen = null;
+var _screen_focused: bool = false;
 
 @onready var _background: ColorRect = $Background;
 @onready var _menu_container: HBoxContainer = $MenuContainer;
@@ -48,13 +49,23 @@ func _build_menu_list() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("menu"):
 		if _is_open:
-			_close_menu();
+			if _screen_focused:
+				_exit_screen();
+			else:
+				_close_menu();
 		else:
 			_open_menu();
 		get_viewport().set_input_as_handled();
 		return;
 
 	if not _is_open:
+		return;
+
+	# When a screen is focused, let the screen handle input
+	if _screen_focused:
+		if event.is_action_pressed("interact2"):
+			_exit_screen();
+			get_viewport().set_input_as_handled();
 		return;
 
 	if event.is_action_pressed("move_up"):
@@ -66,11 +77,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		_update_selection();
 		get_viewport().set_input_as_handled();
 	elif event.is_action_pressed("interact"):
-		_activate_screen(_selected_index);
+		_enter_screen();
 		get_viewport().set_input_as_handled();
 
 func _open_menu() -> void:
 	_is_open = true;
+	_screen_focused = false;
 	_background.visible = true;
 	_menu_container.visible = true;
 	_selected_index = 0;
@@ -80,6 +92,7 @@ func _open_menu() -> void:
 
 func _close_menu() -> void:
 	_is_open = false;
+	_screen_focused = false;
 	_background.visible = false;
 	_menu_container.visible = false;
 
@@ -90,17 +103,23 @@ func _close_menu() -> void:
 	get_tree().paused = false;
 	Events.menu_closed.emit();
 
-func _activate_screen(index: int) -> void:
-	if index < 0 or index >= _screens.size():
-		return;
-
+func _enter_screen() -> void:
 	if _active_screen:
-		_active_screen.deactivate();
+		_screen_focused = true;
+		_active_screen.enter();
 
-	_active_screen = _screens[index];
-	_active_screen.activate();
+func _exit_screen() -> void:
+	if _active_screen:
+		_screen_focused = false;
+		_active_screen.exit();
 
 func _update_selection() -> void:
+	# Deactivate previous screen
+	if _active_screen:
+		_active_screen.deactivate();
+		_active_screen = null;
+
+	# Update label styling
 	for i in _menu_labels.size():
 		var label = _menu_labels[i];
 		if i == _selected_index:
@@ -109,3 +128,8 @@ func _update_selection() -> void:
 		else:
 			label.add_theme_color_override("font_color", Color.WHITE);
 			label.text = _screens[i].screen_name;
+
+	# Activate the selected screen immediately (show + load data)
+	if _selected_index >= 0 and _selected_index < _screens.size():
+		_active_screen = _screens[_selected_index];
+		_active_screen.activate();

@@ -1,0 +1,118 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://scripts/game.gd" id="1_game"]
+[ext_resource type="PackedScene" uid="uid://dnrcdwtoogmg2" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://dt6qf2frkh2w3" path="res://scenes/interaction_prompt.gd" id="3_prompt"]
+[ext_resource type="Script" uid="uid://bead2mudseie8" path="res://scenes/dialog_window.gd" id="4_dialog"]
+[ext_resource type="Script" uid="uid://cbp76lvd4ua5w" path="res://components/transition_manager.gd" id="5_trans"]
+[ext_resource type="PackedScene" path="res://components/menu/menu_root.tscn" id="6_menu"]
+[ext_resource type="Script" path="res://components/fade_overlay.gd" id="7_fade"]
+[ext_resource type="PackedScene" path="res://scenes/maps/main_room.tscn" id="8_startmap"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prompt"]
+bg_color = Color(0, 0, 0, 0.7058824)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+border_blend = true
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.47058824)
+shadow_size = 4
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_game")
+starting_map = ExtResource("8_startmap")
+
+[node name="MapContainer" type="Node2D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="InteractionPrompt" type="Control" parent="CanvasLayer"]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = 32.0
+offset_top = -32.0
+offset_right = 72.0
+offset_bottom = 8.0
+script = ExtResource("3_prompt")
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/InteractionPrompt"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_prompt")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/InteractionPrompt/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="InteractionPromptText" type="RichTextLabel" parent="CanvasLayer/InteractionPrompt/PanelContainer/MarginContainer"]
+layout_mode = 2
+fit_content = true
+autowrap_mode = 0
+
+[node name="DialogWindow" type="Control" parent="CanvasLayer"]
+visible = false
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 3
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -159.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("4_dialog")
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/DialogWindow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/DialogWindow/PanelContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/DialogWindow/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PortraitTexture" type="TextureRect" parent="CanvasLayer/DialogWindow/PanelContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+stretch_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/DialogWindow/PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DialogName" type="RichTextLabel" parent="CanvasLayer/DialogWindow/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+
+[node name="DialogText" type="RichTextLabel" parent="CanvasLayer/DialogWindow/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TransitionManager" type="Node" parent="."]
+script = ExtResource("5_trans")
+fade_duration = 0.5
+
+[node name="MenuRoot" parent="." instance=ExtResource("6_menu")]
+
+[node name="FadeOverlay" type="CanvasLayer" parent="."]
+script = ExtResource("7_fade")

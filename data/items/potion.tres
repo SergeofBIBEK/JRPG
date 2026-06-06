@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/item_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+item_name = "Potion"
+description = "Restores 50 HP to one ally."
+item_type = 0
+target_type = 0
+hp_restore = 50
+mp_restore = 0
+revives = false
+revive_hp_percent = 0.5

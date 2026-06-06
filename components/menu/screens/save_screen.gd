@@ -7,5 +7,7 @@ func _init() -> void:
 
 func activate() -> void:
 	super.activate();
-	print("[SaveScreen] Activated — emitting menu_save_requested");
+
+func enter() -> void:
+	print("[SaveScreen] Save requested — emitting menu_save_requested");
 	Events.menu_save_requested.emit();

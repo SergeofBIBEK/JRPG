@@ -64,32 +64,41 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_screen_bg")
 
 [node name="ItemsScreen" type="Control" parent="."]
 visible = false
-layout_mode = 1
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 168.0
+offset_top = 36.0
+offset_right = -40.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("2_items")
-
-[node name="PlaceholderLabel" type="Label" parent="ItemsScreen"]
-layout_mode = 0
-offset_right = 200.0
-offset_bottom = 23.0
-text = "Items screen — coming soon"
 
 [node name="StatusScreen" type="Control" parent="."]
 visible = false
-layout_mode = 1
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 168.0
+offset_top = 36.0
+offset_right = -40.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("3_status")
-
-[node name="PlaceholderLabel" type="Label" parent="StatusScreen"]
-layout_mode = 0
-offset_right = 200.0
-offset_bottom = 23.0
-text = "Status screen — coming soon"
 
 [node name="SaveScreen" type="Control" parent="."]
 visible = false
-layout_mode = 1
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 168.0
+offset_top = 36.0
+offset_right = -40.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("4_save")
 
 [node name="PlaceholderLabel" type="Label" parent="SaveScreen"]
@@ -100,8 +109,15 @@ text = "Save screen — coming soon"
 
 [node name="QuitScreen" type="Control" parent="."]
 visible = false
-layout_mode = 1
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 168.0
+offset_top = 36.0
+offset_right = -40.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("5_quit")
 
 [node name="PlaceholderLabel" type="Label" parent="QuitScreen"]
