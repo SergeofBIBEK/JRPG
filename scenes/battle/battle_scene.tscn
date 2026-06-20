@@ -1,0 +1,296 @@
+[gd_scene format=3 uid="uid://4qgye34xpucb"]
+
+[ext_resource type="Script" uid="uid://cxi7fagp7nifo" path="res://scripts/battle/battle_scene.gd" id="1_battle"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_message_bar"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(0.02, 0.02, 0.08, 0.75)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_party"]
+bg_color = Color(0.05, 0.05, 0.14, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.45, 0.5, 0.75, 0.6)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info"]
+bg_color = Color(0.04, 0.04, 0.12, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.45, 0.5, 0.7, 0.5)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_command"]
+bg_color = Color(0.05, 0.05, 0.14, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.55, 0.75, 0.7)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="BattleScene" type="CanvasLayer" unique_id=530151834]
+layer = 10
+script = ExtResource("1_battle")
+
+[node name="BattleRoot" type="Control" parent="." unique_id=1155314781]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BattleBackground" type="ColorRect" parent="BattleRoot" unique_id=1061481782]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.12, 0.22, 1)
+
+[node name="EnemyPlaceholder" type="ColorRect" parent="BattleRoot" unique_id=374497538]
+layout_mode = 1
+offset_left = 89.0
+offset_top = 64.0
+offset_right = 153.0
+offset_bottom = 128.0
+color = Color(0.7, 0.2, 0.2, 1)
+
+[node name="EnemyLabel" type="Label" parent="BattleRoot/EnemyPlaceholder" unique_id=126691964]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Enemy"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlayerPlaceholder" type="ColorRect" parent="BattleRoot" unique_id=1057935008]
+layout_mode = 1
+offset_left = 416.0
+offset_top = 65.0
+offset_right = 480.0
+offset_bottom = 129.0
+color = Color(0.2, 0.4, 0.7, 1)
+
+[node name="PlayerLabel" type="Label" parent="BattleRoot/PlayerPlaceholder" unique_id=937967961]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Hero"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MessageBar" type="PanelContainer" parent="BattleRoot" unique_id=467456334]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 20.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_message_bar")
+
+[node name="MessageLabel" type="Label" parent="BattleRoot/MessageBar" unique_id=1942744461]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightColumn" type="VBoxContainer" parent="BattleRoot" unique_id=1240821697]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -120.0
+offset_top = 24.0
+offset_bottom = -80.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_constants/separation = 2
+
+[node name="PartyPanel0" type="PanelContainer" parent="BattleRoot/RightColumn" unique_id=1766605800]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_party")
+
+[node name="Margin0" type="MarginContainer" parent="BattleRoot/RightColumn/PartyPanel0" unique_id=2120411511]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 2
+
+[node name="VBox0" type="VBoxContainer" parent="BattleRoot/RightColumn/PartyPanel0/Margin0" unique_id=672782592]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="PartyName0" type="Label" parent="BattleRoot/RightColumn/PartyPanel0/Margin0/VBox0" unique_id=2116069488]
+layout_mode = 2
+text = "---"
+
+[node name="PartyHP0" type="Label" parent="BattleRoot/RightColumn/PartyPanel0/Margin0/VBox0" unique_id=2053502879]
+layout_mode = 2
+text = "HP: --/--"
+
+[node name="PartyMP0" type="Label" parent="BattleRoot/RightColumn/PartyPanel0/Margin0/VBox0" unique_id=765797431]
+layout_mode = 2
+text = "MP: --/--"
+
+[node name="PartyPanel1" type="PanelContainer" parent="BattleRoot/RightColumn" unique_id=2119490901]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_party")
+
+[node name="Margin1" type="MarginContainer" parent="BattleRoot/RightColumn/PartyPanel1" unique_id=1809942717]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 2
+
+[node name="VBox1" type="VBoxContainer" parent="BattleRoot/RightColumn/PartyPanel1/Margin1" unique_id=1113461922]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="PartyName1" type="Label" parent="BattleRoot/RightColumn/PartyPanel1/Margin1/VBox1" unique_id=1845427670]
+layout_mode = 2
+text = "---"
+
+[node name="PartyHP1" type="Label" parent="BattleRoot/RightColumn/PartyPanel1/Margin1/VBox1" unique_id=807605391]
+layout_mode = 2
+text = "HP: --/--"
+
+[node name="PartyMP1" type="Label" parent="BattleRoot/RightColumn/PartyPanel1/Margin1/VBox1" unique_id=1162313729]
+layout_mode = 2
+text = "MP: --/--"
+
+[node name="PartyPanel2" type="PanelContainer" parent="BattleRoot/RightColumn" unique_id=1855744045]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_party")
+
+[node name="Margin2" type="MarginContainer" parent="BattleRoot/RightColumn/PartyPanel2" unique_id=1083167689]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 2
+
+[node name="VBox2" type="VBoxContainer" parent="BattleRoot/RightColumn/PartyPanel2/Margin2" unique_id=881177946]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="PartyName2" type="Label" parent="BattleRoot/RightColumn/PartyPanel2/Margin2/VBox2" unique_id=939180751]
+layout_mode = 2
+text = "---"
+
+[node name="PartyHP2" type="Label" parent="BattleRoot/RightColumn/PartyPanel2/Margin2/VBox2" unique_id=293890247]
+layout_mode = 2
+text = "HP: --/--"
+
+[node name="PartyMP2" type="Label" parent="BattleRoot/RightColumn/PartyPanel2/Margin2/VBox2" unique_id=1049900911]
+layout_mode = 2
+text = "MP: --/--"
+
+[node name="PartyPanel3" type="PanelContainer" parent="BattleRoot/RightColumn" unique_id=1485231089]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_party")
+
+[node name="Margin3" type="MarginContainer" parent="BattleRoot/RightColumn/PartyPanel3" unique_id=649813626]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 2
+
+[node name="VBox3" type="VBoxContainer" parent="BattleRoot/RightColumn/PartyPanel3/Margin3" unique_id=858759103]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="PartyName3" type="Label" parent="BattleRoot/RightColumn/PartyPanel3/Margin3/VBox3" unique_id=221172974]
+layout_mode = 2
+text = "---"
+
+[node name="PartyHP3" type="Label" parent="BattleRoot/RightColumn/PartyPanel3/Margin3/VBox3" unique_id=2078779588]
+layout_mode = 2
+text = "HP: --/--"
+
+[node name="PartyMP3" type="Label" parent="BattleRoot/RightColumn/PartyPanel3/Margin3/VBox3" unique_id=705745534]
+layout_mode = 2
+text = "MP: --/--"
+
+[node name="BottomLeftColumn" type="VBoxContainer" parent="BattleRoot" unique_id=56050805]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+offset_right = 160.0
+grow_vertical = 0
+theme_override_constants/separation = 2
+
+[node name="InfoBox" type="PanelContainer" parent="BattleRoot/BottomLeftColumn" unique_id=3068190]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_info")
+
+[node name="InfoMargin" type="MarginContainer" parent="BattleRoot/BottomLeftColumn/InfoBox" unique_id=1717345783]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 2
+
+[node name="InfoText" type="Label" parent="BattleRoot/BottomLeftColumn/InfoBox/InfoMargin" unique_id=1085457279]
+layout_mode = 2
+text = "Deal damage to the enemy."
+autowrap_mode = 2
+
+[node name="CommandMenu" type="PanelContainer" parent="BattleRoot/BottomLeftColumn" unique_id=361413466]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_command")
+
+[node name="CmdMargin" type="MarginContainer" parent="BattleRoot/BottomLeftColumn/CommandMenu" unique_id=1580969488]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 3
+
+[node name="CmdVBox" type="VBoxContainer" parent="BattleRoot/BottomLeftColumn/CommandMenu/CmdMargin" unique_id=1056301093]
+layout_mode = 2
+theme_override_constants/separation = 1
+
+[node name="CommandLabel0" type="Label" parent="BattleRoot/BottomLeftColumn/CommandMenu/CmdMargin/CmdVBox" unique_id=1606040641]
+layout_mode = 2
+text = "▶ Attack"
+
+[node name="CommandLabel1" type="Label" parent="BattleRoot/BottomLeftColumn/CommandMenu/CmdMargin/CmdVBox" unique_id=1706776176]
+layout_mode = 2
+text = "   Defend"
+
+[node name="CommandLabel2" type="Label" parent="BattleRoot/BottomLeftColumn/CommandMenu/CmdMargin/CmdVBox" unique_id=1229871069]
+layout_mode = 2
+text = "   Item"
+
+[node name="CommandLabel3" type="Label" parent="BattleRoot/BottomLeftColumn/CommandMenu/CmdMargin/CmdVBox" unique_id=1051328463]
+layout_mode = 2
+text = "   Run"

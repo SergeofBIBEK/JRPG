@@ -18,3 +18,6 @@ signal menu_quit_requested();
 
 signal menu_items_data(inventory: Dictionary);
 signal menu_status_data(party: Array[CharacterData]);
+
+signal battle_requested();
+signal battle_ended();

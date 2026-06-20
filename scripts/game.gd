@@ -10,11 +10,15 @@ extends Node2D;
 @onready var transition_manager: TransitionManager = $TransitionManager;
 
 var current_map: Node2D;
+var _battle_scene: BattleScene = null;
+var _battle_scene_packed: PackedScene = preload("res://scenes/battle/battle_scene.tscn");
 
 func _ready() -> void:
 	_init_party();
 	_init_inventory();
 	_load_map(starting_map, "PlayerSpawn");
+	Events.battle_requested.connect(_on_battle_requested);
+	Events.battle_ended.connect(_on_battle_ended);
 	# Wait for the scene tree to settle before fading in
 	await get_tree().process_frame;
 	await get_tree().process_frame;
@@ -75,3 +79,25 @@ func _get_spawn_point(location_name: String) -> Marker2D:
 	var temp = Marker2D.new();
 	temp.global_position = current_map.global_position;
 	return temp;
+
+func _on_battle_requested() -> void:
+	transition_manager._locked = true;
+	await fade_overlay.fade_out(fade_duration);
+	map_container.visible = false;
+	player.visible = false;
+	player.process_mode = Node.PROCESS_MODE_DISABLED;
+	_battle_scene = _battle_scene_packed.instantiate() as BattleScene;
+	add_child(_battle_scene);
+	await fade_overlay.fade_in(fade_duration);
+
+func _on_battle_ended() -> void:
+	await fade_overlay.fade_out(fade_duration);
+	if _battle_scene:
+		remove_child(_battle_scene);
+		_battle_scene.queue_free();
+		_battle_scene = null;
+	map_container.visible = true;
+	player.visible = true;
+	player.process_mode = Node.PROCESS_MODE_INHERIT;
+	await fade_overlay.fade_in(fade_duration);
+	transition_manager._locked = false;
