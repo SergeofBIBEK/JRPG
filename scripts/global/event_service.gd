@@ -21,3 +21,7 @@ signal menu_status_data(party: Array[CharacterData]);
 
 signal battle_requested();
 signal battle_ended();
+
+signal battle_state_changed(new_state: String);
+signal battle_message(text: String);
+signal battle_hp_updated();

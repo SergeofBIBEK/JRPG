@@ -1,17 +1,14 @@
 class_name BattleScene;
 extends CanvasLayer;
 
-# -- Message bar (top overlay) --
 @onready var message_bar: PanelContainer = $BattleRoot/MessageBar;
 @onready var message_label: Label = $BattleRoot/MessageBar/MessageLabel;
 
-# -- Command labels --
 @onready var command_label_0: Label = $BattleRoot/BottomLeftColumn/CommandMenu/CmdMargin/CmdVBox/CommandLabel0;
 @onready var command_label_1: Label = $BattleRoot/BottomLeftColumn/CommandMenu/CmdMargin/CmdVBox/CommandLabel1;
 @onready var command_label_2: Label = $BattleRoot/BottomLeftColumn/CommandMenu/CmdMargin/CmdVBox/CommandLabel2;
 @onready var command_label_3: Label = $BattleRoot/BottomLeftColumn/CommandMenu/CmdMargin/CmdVBox/CommandLabel3;
 
-# -- Party panels --
 @onready var party_panels: Array[PanelContainer] = [
 	$BattleRoot/RightColumn/PartyPanel0,
 	$BattleRoot/RightColumn/PartyPanel1,
@@ -34,10 +31,8 @@ extends CanvasLayer;
 @onready var party_hp_3: Label = $BattleRoot/RightColumn/PartyPanel3/Margin3/VBox3/PartyHP3;
 @onready var party_mp_3: Label = $BattleRoot/RightColumn/PartyPanel3/Margin3/VBox3/PartyMP3;
 
-# -- Info box --
 @onready var info_text: Label = $BattleRoot/BottomLeftColumn/InfoBox/InfoMargin/InfoText;
 
-# -- State --
 var _command_labels: Array[Label] = [];
 var _command_names: Array[String] = ["Attack", "Defend", "Item", "Run"];
 var _command_descriptions: Array[String] = [
@@ -47,19 +42,34 @@ var _command_descriptions: Array[String] = [
 	"Flee from battle.",
 ];
 var _current_index: int = 0;
-var _battle_over: bool = false;
 var _message_tween: Tween = null;
+
+var _in_item_menu: bool = false;
+var _item_list: Array[ItemData] = [];
+var _item_index: int = 0;
 
 func _ready() -> void:
 	_command_labels = [command_label_0, command_label_1, command_label_2, command_label_3];
-	# Hide message bar initially
 	message_bar.modulate.a = 0.0;
+
+	Events.battle_state_changed.connect(_on_battle_state_changed);
+	Events.battle_message.connect(_on_battle_message);
+	Events.battle_hp_updated.connect(_on_battle_hp_updated);
+
 	_populate_party_panels();
 	_update_cursor();
-	_show_message("A wild enemy appeared!");
+	BattleManager.start_battle();
+
+func _exit_tree() -> void:
+	if Events.battle_state_changed.is_connected(_on_battle_state_changed):
+		Events.battle_state_changed.disconnect(_on_battle_state_changed);
+	if Events.battle_message.is_connected(_on_battle_message):
+		Events.battle_message.disconnect(_on_battle_message);
+	if Events.battle_hp_updated.is_connected(_on_battle_hp_updated):
+		Events.battle_hp_updated.disconnect(_on_battle_hp_updated);
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _battle_over:
+	if BattleManager.current_state != BattleManager.State.PLAYER_COMMAND:
 		return;
 
 	if event.is_action_pressed("move_up"):
@@ -69,12 +79,28 @@ func _unhandled_input(event: InputEvent) -> void:
 		_navigate(1);
 		get_viewport().set_input_as_handled();
 	elif event.is_action_pressed("interact"):
-		_execute_command(_current_index);
+		_confirm_selection();
 		get_viewport().set_input_as_handled();
+	elif event.is_action_pressed("menu"):
+		if _in_item_menu:
+			_close_item_menu();
+			get_viewport().set_input_as_handled();
 
 func _navigate(direction: int) -> void:
-	_current_index = wrapi(_current_index + direction, 0, _command_labels.size());
-	_update_cursor();
+	if _in_item_menu:
+		if _item_list.size() == 0:
+			return;
+		_item_index = wrapi(_item_index + direction, 0, _item_list.size());
+		_update_item_cursor();
+	else:
+		_current_index = wrapi(_current_index + direction, 0, _command_labels.size());
+		_update_cursor();
+
+func _confirm_selection() -> void:
+	if _in_item_menu:
+		_select_item();
+	else:
+		_execute_command(_current_index);
 
 func _update_cursor() -> void:
 	for i in range(_command_labels.size()):
@@ -86,46 +112,77 @@ func _update_cursor() -> void:
 	info_text.text = _command_descriptions[_current_index];
 
 func _execute_command(index: int) -> void:
-	match _command_names[index]:
-		"Attack":
-			var party = PartyManager.get_party();
-			var attacker_name = "Hero";
-			if party.size() > 0:
-				attacker_name = party[0].character_name;
-			_show_message(attacker_name + " attacks! 12 damage dealt.");
-		"Defend":
-			var party = PartyManager.get_party();
-			var defender_name = "Hero";
-			if party.size() > 0:
-				defender_name = party[0].character_name;
-			_show_message(defender_name + " is defending.");
-		"Item":
-			var items = ItemManager.get_all_items();
-			if items.is_empty():
-				_show_message("No items in inventory.");
-			else:
-				var item_lines: String = "Items: ";
-				var entries: Array[String] = [];
-				for item in items:
-					entries.append(item.item_name + " x" + str(items[item]));
-				item_lines += ", ".join(entries);
-				_show_message(item_lines);
-		"Run":
-			_battle_over = true;
-			_show_message("Ran away!");
-			await get_tree().create_timer(1.0).timeout;
-			Events.battle_ended.emit();
+	var command = _command_names[index];
+	if command == "Item":
+		_open_item_menu();
+	else:
+		BattleManager.select_command(command);
 
-## Show a temporary message in the top bar, then fade it out.
+func _open_item_menu() -> void:
+	var inventory = ItemManager.get_all_items();
+	_item_list.clear();
+	for item in inventory:
+		_item_list.append(item);
+
+	if _item_list.is_empty():
+		_show_message("No items in inventory.");
+		return;
+
+	_in_item_menu = true;
+	_item_index = 0;
+	_update_item_cursor();
+	info_text.text = "Choose an item. Press ESC to go back.";
+
+func _update_item_cursor() -> void:
+	for i in range(_command_labels.size()):
+		if i < _item_list.size():
+			var item = _item_list[i];
+			var qty = ItemManager.get_item_count(item);
+			if i == _item_index:
+				_command_labels[i].text = "▶ " + item.item_name + " x" + str(qty);
+			else:
+				_command_labels[i].text = "   " + item.item_name + " x" + str(qty);
+			_command_labels[i].visible = true;
+		else:
+			_command_labels[i].text = "";
+			_command_labels[i].visible = false;
+
+func _select_item() -> void:
+	if _item_index >= _item_list.size():
+		return;
+	var item = _item_list[_item_index];
+	_close_item_menu();
+	BattleManager.select_item(item);
+
+func _close_item_menu() -> void:
+	_in_item_menu = false;
+	for label in _command_labels:
+		label.visible = true;
+	_update_cursor();
+
+func _on_battle_state_changed(new_state: String) -> void:
+	match new_state:
+		"PLAYER_COMMAND":
+			_current_index = 0;
+			_update_cursor();
+		"VICTORY", "DEFEAT", "FLED":
+			for label in _command_labels:
+				label.text = "";
+			info_text.text = "";
+
+func _on_battle_message(text: String) -> void:
+	_show_message(text);
+
+func _on_battle_hp_updated() -> void:
+	_populate_party_panels();
+
 func _show_message(msg: String) -> void:
-	# Kill any existing fade tween
 	if _message_tween and _message_tween.is_valid():
 		_message_tween.kill();
 
 	message_label.text = msg;
 	message_bar.modulate.a = 1.0;
 
-	# Hold for 2 seconds, then fade out over 0.8 seconds
 	_message_tween = create_tween();
 	_message_tween.tween_interval(2.0);
 	_message_tween.tween_property(message_bar, "modulate:a", 0.0, 0.8);
