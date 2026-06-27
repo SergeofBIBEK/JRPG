@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://4qgye34xpucb"]
 
 [ext_resource type="Script" uid="uid://cxi7fagp7nifo" path="res://scripts/battle/battle_scene.gd" id="1_battle"]
+[ext_resource type="Texture2D" uid="uid://ca0avi52r8xsl" path="res://art/player/player_idle_right.png" id="2_player_sprite"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_message_bar"]
 content_margin_left = 8.0
@@ -85,24 +86,38 @@ text = "Enemy"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlayerPlaceholder" type="ColorRect" parent="BattleRoot" unique_id=1057935008]
+[node name="EnemyInfoPanel" type="PanelContainer" parent="BattleRoot" unique_id=900111001]
 layout_mode = 1
-offset_left = 416.0
-offset_top = 65.0
-offset_right = 480.0
-offset_bottom = 129.0
-color = Color(0.2, 0.4, 0.7, 1)
+offset_left = 69.0
+offset_top = 38.0
+offset_right = 173.0
+offset_bottom = 62.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_party")
 
-[node name="PlayerLabel" type="Label" parent="BattleRoot/PlayerPlaceholder" unique_id=937967961]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Hero"
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="EnemyInfoMargin" type="MarginContainer" parent="BattleRoot/EnemyInfoPanel" unique_id=900111002]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 1
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 1
+
+[node name="EnemyInfoVBox" type="VBoxContainer" parent="BattleRoot/EnemyInfoPanel/EnemyInfoMargin" unique_id=900111003]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="EnemyNameLabel" type="Label" parent="BattleRoot/EnemyInfoPanel/EnemyInfoMargin/EnemyInfoVBox" unique_id=900111004]
+layout_mode = 2
+text = "---"
+
+[node name="EnemyHPLabel" type="Label" parent="BattleRoot/EnemyInfoPanel/EnemyInfoMargin/EnemyInfoVBox" unique_id=900111005]
+layout_mode = 2
+text = "HP: --/--"
+
+[node name="PlayerSprite" type="Sprite2D" parent="BattleRoot" unique_id=1057935008]
+position = Vector2(448, 97)
+scale = Vector2(3, 3)
+flip_h = true
+texture = ExtResource("2_player_sprite")
 
 [node name="MessageBar" type="PanelContainer" parent="BattleRoot" unique_id=467456334]
 layout_mode = 1

@@ -25,3 +25,9 @@ signal battle_ended();
 signal battle_state_changed(new_state: String);
 signal battle_message(text: String);
 signal battle_hp_updated();
+signal battle_enemy_hp_updated();
+
+signal battle_player_attack_anim();
+signal battle_enemy_attack_anim();
+signal battle_player_hit_anim();
+signal battle_enemy_hit_anim();

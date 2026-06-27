@@ -33,6 +33,12 @@ extends CanvasLayer;
 
 @onready var info_text: Label = $BattleRoot/BottomLeftColumn/InfoBox/InfoMargin/InfoText;
 
+@onready var enemy_name_label: Label = $BattleRoot/EnemyInfoPanel/EnemyInfoMargin/EnemyInfoVBox/EnemyNameLabel;
+@onready var enemy_hp_label: Label = $BattleRoot/EnemyInfoPanel/EnemyInfoMargin/EnemyInfoVBox/EnemyHPLabel;
+
+@onready var player_sprite: Sprite2D = $BattleRoot/PlayerSprite;
+@onready var enemy_node: ColorRect = $BattleRoot/EnemyPlaceholder;
+
 var _command_labels: Array[Label] = [];
 var _command_names: Array[String] = ["Attack", "Defend", "Item", "Run"];
 var _command_descriptions: Array[String] = [
@@ -48,6 +54,13 @@ var _in_item_menu: bool = false;
 var _item_list: Array[ItemData] = [];
 var _item_index: int = 0;
 
+var _default_enemy: EnemyData = preload("res://data/enemies/goblin.tres");
+
+var _player_rest_pos: Vector2;
+var _enemy_rest_pos: Vector2;
+var _attack_tween: Tween = null;
+var _hit_tween: Tween = null;
+
 func _ready() -> void:
 	_command_labels = [command_label_0, command_label_1, command_label_2, command_label_3];
 	message_bar.modulate.a = 0.0;
@@ -55,10 +68,19 @@ func _ready() -> void:
 	Events.battle_state_changed.connect(_on_battle_state_changed);
 	Events.battle_message.connect(_on_battle_message);
 	Events.battle_hp_updated.connect(_on_battle_hp_updated);
+	Events.battle_enemy_hp_updated.connect(_on_battle_enemy_hp_updated);
+	Events.battle_player_attack_anim.connect(_on_player_attack_anim);
+	Events.battle_enemy_attack_anim.connect(_on_enemy_attack_anim);
+	Events.battle_player_hit_anim.connect(_on_player_hit_anim);
+	Events.battle_enemy_hit_anim.connect(_on_enemy_hit_anim);
+
+	_player_rest_pos = player_sprite.position;
+	_enemy_rest_pos = enemy_node.position;
 
 	_populate_party_panels();
 	_update_cursor();
-	BattleManager.start_battle();
+	BattleManager.start_battle(_default_enemy);
+	_update_enemy_info();
 
 func _exit_tree() -> void:
 	if Events.battle_state_changed.is_connected(_on_battle_state_changed):
@@ -67,6 +89,16 @@ func _exit_tree() -> void:
 		Events.battle_message.disconnect(_on_battle_message);
 	if Events.battle_hp_updated.is_connected(_on_battle_hp_updated):
 		Events.battle_hp_updated.disconnect(_on_battle_hp_updated);
+	if Events.battle_enemy_hp_updated.is_connected(_on_battle_enemy_hp_updated):
+		Events.battle_enemy_hp_updated.disconnect(_on_battle_enemy_hp_updated);
+	if Events.battle_player_attack_anim.is_connected(_on_player_attack_anim):
+		Events.battle_player_attack_anim.disconnect(_on_player_attack_anim);
+	if Events.battle_enemy_attack_anim.is_connected(_on_enemy_attack_anim):
+		Events.battle_enemy_attack_anim.disconnect(_on_enemy_attack_anim);
+	if Events.battle_player_hit_anim.is_connected(_on_player_hit_anim):
+		Events.battle_player_hit_anim.disconnect(_on_player_hit_anim);
+	if Events.battle_enemy_hit_anim.is_connected(_on_enemy_hit_anim):
+		Events.battle_enemy_hit_anim.disconnect(_on_enemy_hit_anim);
 
 func _unhandled_input(event: InputEvent) -> void:
 	if BattleManager.current_state != BattleManager.State.PLAYER_COMMAND:
@@ -176,6 +208,9 @@ func _on_battle_message(text: String) -> void:
 func _on_battle_hp_updated() -> void:
 	_populate_party_panels();
 
+func _on_battle_enemy_hp_updated() -> void:
+	_update_enemy_info();
+
 func _show_message(msg: String) -> void:
 	if _message_tween and _message_tween.is_valid():
 		_message_tween.kill();
@@ -202,3 +237,63 @@ func _populate_party_panels() -> void:
 			party_panels[i].visible = true;
 		else:
 			party_panels[i].visible = false;
+
+func _update_enemy_info() -> void:
+	if BattleManager.enemy != null:
+		enemy_name_label.text = BattleManager.enemy.enemy_name;
+		enemy_hp_label.text = "HP: " + str(BattleManager.enemy.current_hp) + "/" + str(BattleManager.enemy.max_hp);
+	else:
+		enemy_name_label.text = "---";
+		enemy_hp_label.text = "HP: --/--";
+
+# ── Battle Animations ──────────────────────────────────────────────
+
+func _on_player_attack_anim() -> void:
+	if _attack_tween and _attack_tween.is_valid():
+		_attack_tween.kill();
+	player_sprite.position = _player_rest_pos;
+	var lunge_target = _player_rest_pos + Vector2(-30, 0);
+	_attack_tween = create_tween();
+	_attack_tween.tween_property(player_sprite, "position", lunge_target, 0.1).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK);
+	_attack_tween.tween_property(player_sprite, "position", _player_rest_pos, 0.2).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD);
+
+func _on_enemy_attack_anim() -> void:
+	if _attack_tween and _attack_tween.is_valid():
+		_attack_tween.kill();
+	enemy_node.position = _enemy_rest_pos;
+	var lunge_target = _enemy_rest_pos + Vector2(30, 0);
+	_attack_tween = create_tween();
+	_attack_tween.tween_property(enemy_node, "position", lunge_target, 0.1).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK);
+	_attack_tween.tween_property(enemy_node, "position", _enemy_rest_pos, 0.2).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD);
+
+func _on_player_hit_anim() -> void:
+	if _hit_tween and _hit_tween.is_valid():
+		_hit_tween.kill();
+	player_sprite.position = _player_rest_pos;
+	player_sprite.modulate = Color.WHITE;
+	var knockback_pos = _player_rest_pos + Vector2(12, 0);
+	_hit_tween = create_tween();
+	# Flash bright white
+	_hit_tween.tween_property(player_sprite, "modulate", Color(4, 4, 4, 1), 0.04);
+	_hit_tween.tween_property(player_sprite, "modulate", Color.WHITE, 0.04);
+	_hit_tween.tween_property(player_sprite, "modulate", Color(4, 4, 4, 1), 0.04);
+	_hit_tween.tween_property(player_sprite, "modulate", Color.WHITE, 0.04);
+	# Knockback
+	_hit_tween.parallel().tween_property(player_sprite, "position", knockback_pos, 0.08).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD);
+	_hit_tween.tween_property(player_sprite, "position", _player_rest_pos, 0.15).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD);
+
+func _on_enemy_hit_anim() -> void:
+	if _hit_tween and _hit_tween.is_valid():
+		_hit_tween.kill();
+	enemy_node.position = _enemy_rest_pos;
+	enemy_node.modulate = Color.WHITE;
+	var knockback_pos = _enemy_rest_pos + Vector2(-12, 0);
+	_hit_tween = create_tween();
+	# Flash bright white
+	_hit_tween.tween_property(enemy_node, "modulate", Color(4, 4, 4, 1), 0.04);
+	_hit_tween.tween_property(enemy_node, "modulate", Color.WHITE, 0.04);
+	_hit_tween.tween_property(enemy_node, "modulate", Color(4, 4, 4, 1), 0.04);
+	_hit_tween.tween_property(enemy_node, "modulate", Color.WHITE, 0.04);
+	# Knockback
+	_hit_tween.parallel().tween_property(enemy_node, "position", knockback_pos, 0.08).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD);
+	_hit_tween.tween_property(enemy_node, "position", _enemy_rest_pos, 0.15).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD);

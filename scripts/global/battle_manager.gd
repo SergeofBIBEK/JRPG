@@ -12,28 +12,26 @@ enum State {
 
 var current_state: State = State.INACTIVE;
 
-var enemy_name: String = "";
-var enemy_hp: int = 0;
-var enemy_max_hp: int = 0;
+var enemy: EnemyData = null;
 
 var _selected_command: String = "";
 var _selected_item: ItemData = null;
+var _is_defending: bool = false;
 
-const PLAYER_ATTACK_DAMAGE: int = 12;
-const ENEMY_ATTACK_DAMAGE: int = 8;
-const ITEM_HEAL_AMOUNT: int = 20;
 const PHASE_DELAY: float = 1.2;
+const ANIM_DELAY: float = 0.35;
 
-func start_battle() -> void:
-	enemy_name = "Goblin";
-	enemy_max_hp = 40;
-	enemy_hp = enemy_max_hp;
+func start_battle(enemy_data: EnemyData) -> void:
+	enemy = enemy_data.duplicate();
+	enemy.current_hp = enemy.max_hp;
 
 	_selected_command = "";
 	_selected_item = null;
+	_is_defending = false;
 
 	_change_state(State.PLAYER_COMMAND);
-	Events.battle_message.emit("A " + enemy_name + " appeared!");
+	Events.battle_message.emit("A " + enemy.enemy_name + " appeared!");
+	Events.battle_enemy_hp_updated.emit();
 
 func select_command(command_name: String) -> void:
 	if current_state != State.PLAYER_COMMAND:
@@ -53,6 +51,12 @@ func select_item(item: ItemData) -> void:
 func is_active() -> bool:
 	return current_state != State.INACTIVE;
 
+func _calculate_damage(attacker_atk: int, defender_def: int) -> int:
+	var base_damage = (attacker_atk * 2) - defender_def;
+	var variance = maxi(1, base_damage / 8);
+	var final_damage = base_damage + randi_range(-variance, variance);
+	return maxi(1, final_damage);
+
 func _change_state(new_state: State) -> void:
 	current_state = new_state;
 	Events.battle_state_changed.emit(State.keys()[new_state]);
@@ -71,11 +75,19 @@ func _execute_player_action() -> void:
 func _do_attack() -> void:
 	var party = PartyManager.get_party();
 	var attacker_name = "Hero";
+	var attacker_atk = 10;
 	if party.size() > 0:
 		attacker_name = party[0].character_name;
+		attacker_atk = party[0].attack;
 
-	enemy_hp = maxi(enemy_hp - PLAYER_ATTACK_DAMAGE, 0);
-	Events.battle_message.emit(attacker_name + " attacks! " + str(PLAYER_ATTACK_DAMAGE) + " damage dealt.");
+	Events.battle_player_attack_anim.emit();
+	await get_tree().create_timer(ANIM_DELAY).timeout;
+
+	var damage = _calculate_damage(attacker_atk, enemy.defense);
+	enemy.take_damage(damage);
+	Events.battle_enemy_hit_anim.emit();
+	Events.battle_message.emit(attacker_name + " attacks! " + str(damage) + " damage dealt.");
+	Events.battle_enemy_hp_updated.emit();
 
 	await _phase_delay();
 
@@ -89,6 +101,7 @@ func _do_defend() -> void:
 	if party.size() > 0:
 		defender_name = party[0].character_name;
 
+	_is_defending = true;
 	Events.battle_message.emit(defender_name + " is defending.");
 
 	await _phase_delay();
@@ -106,10 +119,11 @@ func _do_item() -> void:
 		return;
 
 	var hero = party[0];
-	hero.heal_hp(ITEM_HEAL_AMOUNT);
+	var heal_amount = _selected_item.hp_restore;
+	hero.heal_hp(heal_amount);
 	ItemManager.remove_item(_selected_item, 1);
 
-	Events.battle_message.emit(hero.character_name + " used " + _selected_item.item_name + "! Healed " + str(ITEM_HEAL_AMOUNT) + " HP.");
+	Events.battle_message.emit(hero.character_name + " used " + _selected_item.item_name + "! Healed " + str(heal_amount) + " HP.");
 	Events.battle_hp_updated.emit();
 
 	_selected_item = null;
@@ -135,9 +149,20 @@ func _start_enemy_action() -> void:
 		return;
 
 	var target = party[0];
-	target.current_hp = maxi(target.current_hp - ENEMY_ATTACK_DAMAGE, 0);
-	Events.battle_message.emit(enemy_name + " attacks! " + str(ENEMY_ATTACK_DAMAGE) + " damage to " + target.character_name + ".");
+	var raw_damage = _calculate_damage(enemy.attack, target.defense);
+
+	if _is_defending:
+		raw_damage = maxi(1, ceili(raw_damage / 2.0));
+
+	Events.battle_enemy_attack_anim.emit();
+	await get_tree().create_timer(ANIM_DELAY).timeout;
+
+	target.current_hp = maxi(target.current_hp - raw_damage, 0);
+	Events.battle_player_hit_anim.emit();
+	Events.battle_message.emit(enemy.enemy_name + " attacks! " + str(raw_damage) + " damage to " + target.character_name + ".");
 	Events.battle_hp_updated.emit();
+
+	_is_defending = false;
 
 	await _phase_delay();
 
@@ -146,9 +171,9 @@ func _start_enemy_action() -> void:
 	_change_state(State.PLAYER_COMMAND);
 
 func _check_victory() -> bool:
-	if enemy_hp <= 0:
+	if enemy == null or not enemy.is_alive():
 		_change_state(State.VICTORY);
-		Events.battle_message.emit("Victory! " + enemy_name + " was defeated!");
+		Events.battle_message.emit("Victory! " + enemy.enemy_name + " was defeated!");
 		await _phase_delay();
 		_end_battle();
 		return true;
