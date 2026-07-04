@@ -31,3 +31,6 @@ signal battle_player_attack_anim();
 signal battle_enemy_attack_anim();
 signal battle_player_hit_anim();
 signal battle_enemy_hit_anim();
+
+signal battle_rewards(exp_gained: int, gold_gained: int);
+signal battle_level_up(character_name: String, new_level: int);

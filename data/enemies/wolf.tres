@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/enemy_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+enemy_name = "Wolf"
+level = 2
+max_hp = 55
+current_hp = 55
+attack = 11
+defense = 5
+speed = 9
+exp_reward = 18
+gold_reward = 10

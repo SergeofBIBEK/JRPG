@@ -54,7 +54,7 @@ var _in_item_menu: bool = false;
 var _item_list: Array[ItemData] = [];
 var _item_index: int = 0;
 
-var _default_enemy: EnemyData = preload("res://data/enemies/goblin.tres");
+
 
 var _player_rest_pos: Vector2;
 var _enemy_rest_pos: Vector2;
@@ -79,7 +79,7 @@ func _ready() -> void:
 
 	_populate_party_panels();
 	_update_cursor();
-	BattleManager.start_battle(_default_enemy);
+	BattleManager.start_random_battle();
 	_update_enemy_info();
 
 func _exit_tree() -> void:
@@ -231,7 +231,7 @@ func _populate_party_panels() -> void:
 	for i in range(4):
 		if i < party.size():
 			var member = party[i];
-			party_names[i].text = member.character_name;
+			party_names[i].text = "Lv" + str(member.level) + "  " + member.character_name;
 			party_hps[i].text = "HP: " + str(member.current_hp) + "/" + str(member.max_hp);
 			party_mps[i].text = "MP: " + str(member.current_mp) + "/" + str(member.max_mp);
 			party_panels[i].visible = true;

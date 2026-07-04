@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/enemy_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+enemy_name = "Slime"
+level = 1
+max_hp = 30
+current_hp = 30
+attack = 5
+defense = 3
+speed = 4
+exp_reward = 8
+gold_reward = 3

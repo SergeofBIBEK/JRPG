@@ -82,7 +82,24 @@ func _create_character_card(character: CharacterData) -> PanelContainer:
 	level_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7));
 	header.add_child(level_label);
 
-	# Row 2: HP bar
+	# Row 2: EXP + Gold
+	var info_row = HBoxContainer.new();
+	info_row.add_theme_constant_override("separation", 16);
+	vbox.add_child(info_row);
+
+	var exp_label = Label.new();
+	exp_label.text = "EXP " + str(character.experience) + "/" + str(character.exp_to_next_level());
+	exp_label.add_theme_font_size_override("font_size", 10);
+	exp_label.add_theme_color_override("font_color", Color(0.5, 0.8, 1.0));
+	info_row.add_child(exp_label);
+
+	var gold_label = Label.new();
+	gold_label.text = "Gold " + str(character.gold);
+	gold_label.add_theme_font_size_override("font_size", 10);
+	gold_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3));
+	info_row.add_child(gold_label);
+
+	# Row 3: HP bar
 	var hp_row = _create_stat_row(
 		"HP",
 		str(character.current_hp) + " / " + str(character.max_hp),

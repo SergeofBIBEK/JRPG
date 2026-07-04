@@ -21,6 +21,20 @@ var _is_defending: bool = false;
 const PHASE_DELAY: float = 1.2;
 const ANIM_DELAY: float = 0.35;
 
+# ── Enemy Pool ────────────────────────────────────────────────────────
+var _enemy_pool: Array[EnemyData] = [];
+
+func _ready() -> void:
+	_enemy_pool = [
+		preload("res://data/enemies/goblin.tres"),
+		preload("res://data/enemies/slime.tres"),
+		preload("res://data/enemies/wolf.tres"),
+	];
+
+func start_random_battle() -> void:
+	var template = _enemy_pool.pick_random();
+	start_battle(template);
+
 func start_battle(enemy_data: EnemyData) -> void:
 	enemy = enemy_data.duplicate();
 	enemy.current_hp = enemy.max_hp;
@@ -175,9 +189,44 @@ func _check_victory() -> bool:
 		_change_state(State.VICTORY);
 		Events.battle_message.emit("Victory! " + enemy.enemy_name + " was defeated!");
 		await _phase_delay();
+		await _award_rewards();
 		_end_battle();
 		return true;
 	return false;
+
+func _award_rewards() -> void:
+	var exp_gained = enemy.exp_reward;
+	var gold_gained = enemy.gold_reward;
+
+	Events.battle_rewards.emit(exp_gained, gold_gained);
+	Events.battle_message.emit("Gained " + str(exp_gained) + " EXP and " + str(gold_gained) + " Gold!");
+	await _phase_delay();
+
+	var party = PartyManager.get_party();
+	for member in party:
+		if member.is_alive():
+			member.gold += gold_gained;
+			# Capture stats before leveling
+			var old_hp = member.max_hp;
+			var old_mp = member.max_mp;
+			var old_atk = member.attack;
+			var old_def = member.defense;
+			var old_spd = member.speed;
+			var leveled = member.add_experience(exp_gained);
+			if leveled:
+				Events.battle_level_up.emit(member.character_name, member.level);
+				Events.battle_message.emit(member.character_name + " reached Level " + str(member.level) + "!");
+				Events.battle_hp_updated.emit();
+				await _phase_delay();
+				# Show stat increases
+				var stats_msg = "HP+" + str(member.max_hp - old_hp);
+				stats_msg += "  MP+" + str(member.max_mp - old_mp);
+				stats_msg += "  ATK+" + str(member.attack - old_atk);
+				stats_msg += "  DEF+" + str(member.defense - old_def);
+				stats_msg += "  SPD+" + str(member.speed - old_spd);
+				Events.battle_message.emit(stats_msg);
+				await _phase_delay();
+				await _phase_delay();
 
 func _check_defeat() -> bool:
 	var party = PartyManager.get_party();
