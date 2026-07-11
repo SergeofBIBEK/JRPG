@@ -108,6 +108,11 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 3
 
+[node name="AdvanceIndicator" type="Label" parent="CanvasLayer/DialogWindow/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "▼"
+
 [node name="TransitionManager" type="Node" parent="."]
 script = ExtResource("5_trans")
 fade_duration = 0.5

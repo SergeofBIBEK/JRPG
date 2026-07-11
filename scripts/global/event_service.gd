@@ -5,6 +5,8 @@ signal hide_interaction_prompt();
 
 signal show_dialog(dialog_image: Texture2D, dialog_text: Array[String], dialog_name: String);
 signal hide_dialog();
+signal dialog_finished();
+signal dialog_advance_requested();
 
 signal transition_requested(target_map_path: String, spawn_location: String);
 

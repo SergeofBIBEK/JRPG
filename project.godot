@@ -22,6 +22,7 @@ ItemManager="*res://scripts/global/item_manager.gd"
 PartyManager="*res://scripts/global/party_manager.gd"
 SaveManager="*res://scripts/global/save_manager.gd"
 BattleManager="*res://scripts/global/battle_manager.gd"
+QuestManager="*res://scripts/global/quest_manager.gd"
 
 [display]
 

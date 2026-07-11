@@ -9,6 +9,10 @@
 [ext_resource type="Script" uid="uid://0dfthb7bg7q0" path="res://components/interaction_behaviors/dialog_behavior.gd" id="7_dialog"]
 [ext_resource type="Script" uid="uid://vbr6ykxo100a" path="res://components/transition_trigger.gd" id="8_trigger"]
 [ext_resource type="Script" uid="uid://b2t5vemtso7ga" path="res://components/interaction_behaviors/battle_behavior.gd" id="9_battle"]
+[ext_resource type="Script" path="res://components/interaction_behaviors/quest_dialog_behavior.gd" id="10_questdialog"]
+[ext_resource type="Script" path="res://components/interaction_behaviors/pickup_behavior.gd" id="11_pickup"]
+[ext_resource type="Resource" path="res://data/items/quest_item.tres" id="12_questitem"]
+[ext_resource type="Resource" path="res://data/items/potion.tres" id="13_potion"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_floor"]
 texture = ExtResource("1_floor")
@@ -72,6 +76,18 @@ sources/1 = SubResource("TileSetAtlasSource_deco")
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_npc"]
 size = Vector2(32, 32)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_npc2"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_npc3"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_npc4"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_barrel"]
+size = Vector2(32, 32)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger1"]
 size = Vector2(63, 15)
 
@@ -120,6 +136,7 @@ metadata/_custom_type_script = "uid://k6ah0x8jcb3f"
 script = ExtResource("7_dialog")
 portrait_texture = ExtResource("4_icon")
 dialog_name = "Godot Dude"
+dialog_lines = Array[String](["Hello there! I am Godot Dude!", "This dialog box now supports multiple pages!", "Press the interact button to advance. Pretty cool, right?"])
 metadata/_custom_type_script = "uid://0dfthb7bg7q0"
 
 [node name="TransitionTrigger" type="Area2D" parent="." unique_id=684359595]
@@ -141,3 +158,93 @@ metadata/_custom_type_script = "uid://vbr6ykxo100a"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TransitionTrigger2" unique_id=472112584]
 shape = SubResource("RectangleShape2D_trigger2")
+
+[node name="NPC1" type="StaticBody2D" parent="."]
+position = Vector2(400, 200)
+
+[node name="Sprite2D" type="Sprite2D" parent="NPC1"]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("4_icon")
+self_modulate = Color(1, 0.6, 0.6, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NPC1"]
+shape = SubResource("RectangleShape2D_npc2")
+
+[node name="InteractionTarget" type="Node2D" parent="NPC1"]
+script = ExtResource("5_itarget")
+
+[node name="QuestDialogBehavior" type="Node2D" parent="NPC1/InteractionTarget"]
+script = ExtResource("10_questdialog")
+portrait_texture = ExtResource("4_icon")
+dialog_name = "Rumormonger"
+dialog_lines = Array[String](["Hey, have you heard?", "They say old Garret lost his family's medallion somewhere in this building.", "I bet it rolled behind one of those old barrels..."])
+flag_to_set = "npc1_talked"
+
+[node name="NPC2" type="StaticBody2D" parent="."]
+position = Vector2(500, 280)
+
+[node name="Sprite2D" type="Sprite2D" parent="NPC2"]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("4_icon")
+self_modulate = Color(0.6, 1, 0.6, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NPC2"]
+shape = SubResource("RectangleShape2D_npc3")
+
+[node name="InteractionTarget" type="Node2D" parent="NPC2"]
+script = ExtResource("5_itarget")
+
+[node name="QuestDialogBehavior" type="Node2D" parent="NPC2/InteractionTarget"]
+script = ExtResource("10_questdialog")
+portrait_texture = ExtResource("4_icon")
+dialog_name = "Bystander"
+dialog_lines = Array[String](["Nice weather today, huh?", "Not much going on around here."])
+alt_dialog_lines = Array[String](["Oh, so you've heard the rumors too?", "Between you and me, I saw something shiny near that old barrel in the corner.", "Might be worth checking out!"])
+required_flag = "npc1_talked"
+
+[node name="OldBarrel" type="StaticBody2D" parent="."]
+position = Vector2(250, 140)
+
+[node name="Sprite2D" type="Sprite2D" parent="OldBarrel"]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("4_icon")
+self_modulate = Color(0.7, 0.5, 0.3, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OldBarrel"]
+shape = SubResource("RectangleShape2D_barrel")
+
+[node name="InteractionTarget" type="Node2D" parent="OldBarrel"]
+script = ExtResource("5_itarget")
+
+[node name="PickupBehavior" type="Node2D" parent="OldBarrel/InteractionTarget"]
+script = ExtResource("11_pickup")
+item = ExtResource("12_questitem")
+pickup_dialog_lines = Array[String](["You rummage behind the old barrel...", "You found an Old Medallion!"])
+already_picked_up_lines = Array[String](["There's nothing else here."])
+
+[node name="NPC3" type="StaticBody2D" parent="."]
+position = Vector2(350, 300)
+
+[node name="Sprite2D" type="Sprite2D" parent="NPC3"]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("4_icon")
+self_modulate = Color(0.6, 0.6, 1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NPC3"]
+shape = SubResource("RectangleShape2D_npc4")
+
+[node name="InteractionTarget" type="Node2D" parent="NPC3"]
+script = ExtResource("5_itarget")
+
+[node name="QuestDialogBehavior" type="Node2D" parent="NPC3/InteractionTarget"]
+script = ExtResource("10_questdialog")
+portrait_texture = ExtResource("4_icon")
+dialog_name = "Old Garret"
+dialog_lines = Array[String](["Oh dear, oh dear...", "I've lost my family's medallion somewhere in this building.", "It's been in our family for generations! Please, if you find it, bring it to me."])
+alt_dialog_lines = Array[String](["My medallion! You found it!", "Thank you so much, adventurer! I can't tell you how much this means to me.", "Here, please take this as a reward."])
+required_item = ExtResource("12_questitem")
+consume_item = true
+alt_flag_to_set = "medallion_returned"
+reward_item = ExtResource("13_potion")
+reward_quantity = 3
+
