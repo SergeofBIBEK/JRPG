@@ -46,6 +46,11 @@ func _build_menu_list() -> void:
 
 	_update_selection();
 
+func _consume_input() -> void:
+	var vp = get_viewport();
+	if vp:
+		vp.set_input_as_handled();
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("menu"):
 		if _is_open:
@@ -55,7 +60,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				_close_menu();
 		else:
 			_open_menu();
-		get_viewport().set_input_as_handled();
+		_consume_input();
 		return;
 
 	if not _is_open:
@@ -65,20 +70,20 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _screen_focused:
 		if event.is_action_pressed("interact2"):
 			_exit_screen();
-			get_viewport().set_input_as_handled();
+			_consume_input();
 		return;
 
 	if event.is_action_pressed("move_up"):
 		_selected_index = wrapi(_selected_index - 1, 0, _screens.size());
 		_update_selection();
-		get_viewport().set_input_as_handled();
+		_consume_input();
 	elif event.is_action_pressed("move_down"):
 		_selected_index = wrapi(_selected_index + 1, 0, _screens.size());
 		_update_selection();
-		get_viewport().set_input_as_handled();
+		_consume_input();
 	elif event.is_action_pressed("interact"):
 		_enter_screen();
-		get_viewport().set_input_as_handled();
+		_consume_input();
 
 func _open_menu() -> void:
 	_is_open = true;

@@ -101,12 +101,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("4_save")
 
-[node name="PlaceholderLabel" type="Label" parent="SaveScreen"]
-layout_mode = 0
-offset_right = 200.0
-offset_bottom = 23.0
-text = "Save screen — coming soon"
-
 [node name="QuitScreen" type="Control" parent="."]
 visible = false
 anchors_preset = 15

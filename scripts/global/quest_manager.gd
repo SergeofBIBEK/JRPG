@@ -11,3 +11,17 @@ func has_flag(flag_name: String) -> bool:
 
 func clear_flag(flag_name: String) -> void:
 	_flags.erase(flag_name);
+
+func get_all_flags() -> Dictionary:
+	return _flags;
+
+func clear() -> void:
+	_flags.clear();
+
+func serialize() -> Array:
+	return _flags.keys();
+
+func deserialize(data: Array) -> void:
+	clear();
+	for flag_name in data:
+		_flags[flag_name] = true;

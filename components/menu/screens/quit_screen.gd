@@ -9,5 +9,5 @@ func activate() -> void:
 	super.activate();
 
 func enter() -> void:
-	print("[QuitScreen] Quitting game...");
-	get_tree().quit();
+	print("[QuitScreen] Returning to title screen...");
+	Events.return_to_title.emit();

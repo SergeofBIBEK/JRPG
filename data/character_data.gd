@@ -2,6 +2,7 @@ class_name CharacterData;
 extends Resource;
 
 @export var character_name: String = "";
+@export var source_path: String = "";
 @export var level: int = 1;
 
 @export_group("HP")

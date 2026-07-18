@@ -34,6 +34,8 @@ func _init() -> void:
 	visible = false;
 
 func _ready():
+	if Engine.is_editor_hint():
+		return;
 	Events.show_dialog.connect(display_dialog);
 	Events.hide_dialog.connect(close_dialog);
 

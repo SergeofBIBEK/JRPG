@@ -55,6 +55,10 @@ func process_interaction():
 	_is_interacting = false;
 
 func _check_conditions() -> bool:
+	# If the alternate-dialog flag was already set, this quest is complete
+	if alt_flag_to_set != "" and QuestManager.has_flag(alt_flag_to_set):
+		return true;
+
 	var flag_met := true;
 	var item_met := true;
 
@@ -67,6 +71,10 @@ func _check_conditions() -> bool:
 	return flag_met and item_met;
 
 func _apply_alt_rewards() -> void:
+	# Don't re-grant rewards if quest was already completed
+	if alt_flag_to_set != "" and QuestManager.has_flag(alt_flag_to_set):
+		return;
+
 	if consume_item and required_item != null:
 		ItemManager.remove_item(required_item, 1);
 

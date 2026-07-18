@@ -33,5 +33,29 @@ func get_all_items() -> Dictionary:
 func has_item(item: ItemData) -> bool:
 	return item in _inventory and _inventory[item] > 0;
 
+func clear() -> void:
+	_inventory.clear();
+
+func serialize() -> Array:
+	var result: Array = [];
+	for item: ItemData in _inventory:
+		result.append({
+			"resource_path": item.resource_path,
+			"quantity": _inventory[item],
+		});
+	return result;
+
+func deserialize(data: Array) -> void:
+	clear();
+	for entry in data:
+		var path = entry.get("resource_path", "") as String;
+		var qty = entry.get("quantity", 1) as int;
+		if path != "" and ResourceLoader.exists(path):
+			var item = load(path) as ItemData;
+			if item:
+				_inventory[item] = qty;
+		else:
+			push_warning("[ItemManager] Could not load item at: " + path);
+
 func _on_items_requested() -> void:
 	Events.menu_items_data.emit(_inventory);
