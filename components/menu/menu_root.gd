@@ -54,11 +54,13 @@ func _consume_input() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("menu"):
 		if _is_open:
+			AudioManager.play_sfx("menu_cancel");
 			if _screen_focused:
 				_exit_screen();
 			else:
 				_close_menu();
 		else:
+			AudioManager.play_sfx("menu_select");
 			_open_menu();
 		_consume_input();
 		return;
@@ -69,6 +71,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	# When a screen is focused, let the screen handle input
 	if _screen_focused:
 		if event.is_action_pressed("interact2"):
+			AudioManager.play_sfx("menu_cancel");
 			_exit_screen();
 			_consume_input();
 		return;
@@ -76,12 +79,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("move_up"):
 		_selected_index = wrapi(_selected_index - 1, 0, _screens.size());
 		_update_selection();
+		AudioManager.play_sfx("menu_cursor");
 		_consume_input();
 	elif event.is_action_pressed("move_down"):
 		_selected_index = wrapi(_selected_index + 1, 0, _screens.size());
 		_update_selection();
+		AudioManager.play_sfx("menu_cursor");
 		_consume_input();
 	elif event.is_action_pressed("interact"):
+		AudioManager.play_sfx("menu_select");
 		_enter_screen();
 		_consume_input();
 

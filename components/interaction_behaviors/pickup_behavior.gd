@@ -32,6 +32,7 @@ func process_interaction():
 		lines = pickup_dialog_lines;
 		if item:
 			ItemManager.add_item(item, quantity);
+			AudioManager.play_sfx("item_pickup");
 		QuestManager.set_flag(pickup_flag);
 
 	Events.show_dialog.emit(portrait_texture, lines, "");

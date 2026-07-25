@@ -28,6 +28,9 @@ func _ready() -> void:
 	_build_load_screen();
 	_show_main_menu();
 
+	# Start title music
+	AudioManager.play_music("title", 0.0);
+
 	# Fade in
 	_fade_rect.modulate.a = 1.0;
 	var tween = create_tween();
@@ -156,12 +159,15 @@ func _handle_menu_input(event: InputEvent) -> void:
 	if event.is_action_pressed("move_up"):
 		_selected_index = wrapi(_selected_index - 1, 0, _options.size());
 		_update_menu_highlight();
+		AudioManager.play_sfx("menu_cursor");
 		_consume_input();
 	elif event.is_action_pressed("move_down"):
 		_selected_index = wrapi(_selected_index + 1, 0, _options.size());
 		_update_menu_highlight();
+		AudioManager.play_sfx("menu_cursor");
 		_consume_input();
 	elif event.is_action_pressed("interact"):
+		AudioManager.play_sfx("menu_select");
 		_select_option(_options[_selected_index]["action"]);
 		_consume_input();
 
@@ -169,15 +175,19 @@ func _handle_load_input(event: InputEvent) -> void:
 	if event.is_action_pressed("move_up"):
 		_load_selected_slot = wrapi(_load_selected_slot - 1, 0, SaveManager.MAX_SLOTS);
 		_update_load_highlight();
+		AudioManager.play_sfx("menu_cursor");
 		_consume_input();
 	elif event.is_action_pressed("move_down"):
 		_load_selected_slot = wrapi(_load_selected_slot + 1, 0, SaveManager.MAX_SLOTS);
 		_update_load_highlight();
+		AudioManager.play_sfx("menu_cursor");
 		_consume_input();
 	elif event.is_action_pressed("interact"):
+		AudioManager.play_sfx("menu_select");
 		_try_load_slot(_load_selected_slot);
 		_consume_input();
 	elif event.is_action_pressed("interact2") or event.is_action_pressed("menu"):
+		AudioManager.play_sfx("menu_cancel");
 		_show_main_menu();
 		_consume_input();
 
@@ -200,6 +210,7 @@ func _start_new_game() -> void:
 	SaveManager.consume_pending_load();
 
 	# Fade out and change scene
+	AudioManager.stop_music(0.5);
 	var tween = create_tween();
 	tween.tween_property(_fade_rect, "modulate:a", 1.0, 0.5);
 	await tween.finished;

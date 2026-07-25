@@ -94,11 +94,13 @@ func _do_attack() -> void:
 		attacker_name = party[0].character_name;
 		attacker_atk = party[0].attack;
 
+	AudioManager.play_sfx("attack_swing");
 	Events.battle_player_attack_anim.emit();
 	await get_tree().create_timer(ANIM_DELAY).timeout;
 
 	var damage = _calculate_damage(attacker_atk, enemy.defense);
 	enemy.take_damage(damage);
+	AudioManager.play_sfx("hit");
 	Events.battle_enemy_hit_anim.emit();
 	Events.battle_message.emit(attacker_name + " attacks! " + str(damage) + " damage dealt.");
 	Events.battle_enemy_hp_updated.emit();
@@ -136,6 +138,7 @@ func _do_item() -> void:
 	var heal_amount = _selected_item.hp_restore;
 	hero.heal_hp(heal_amount);
 	ItemManager.remove_item(_selected_item, 1);
+	AudioManager.play_sfx("item_use");
 
 	Events.battle_message.emit(hero.character_name + " used " + _selected_item.item_name + "! Healed " + str(heal_amount) + " HP.");
 	Events.battle_hp_updated.emit();
@@ -168,10 +171,12 @@ func _start_enemy_action() -> void:
 	if _is_defending:
 		raw_damage = maxi(1, ceili(raw_damage / 2.0));
 
+	AudioManager.play_sfx("attack_swing");
 	Events.battle_enemy_attack_anim.emit();
 	await get_tree().create_timer(ANIM_DELAY).timeout;
 
 	target.current_hp = maxi(target.current_hp - raw_damage, 0);
+	AudioManager.play_sfx("hit");
 	Events.battle_player_hit_anim.emit();
 	Events.battle_message.emit(enemy.enemy_name + " attacks! " + str(raw_damage) + " damage to " + target.character_name + ".");
 	Events.battle_hp_updated.emit();
@@ -187,6 +192,7 @@ func _start_enemy_action() -> void:
 func _check_victory() -> bool:
 	if enemy == null or not enemy.is_alive():
 		_change_state(State.VICTORY);
+		AudioManager.play_music("victory", 0.3);
 		Events.battle_message.emit("Victory! " + enemy.enemy_name + " was defeated!");
 		await _phase_delay();
 		await _award_rewards();
@@ -237,6 +243,7 @@ func _check_defeat() -> bool:
 			break;
 	if all_dead:
 		_change_state(State.DEFEAT);
+		AudioManager.play_music("game_over", 0.3);
 		Events.battle_message.emit("Defeat... The party has fallen.");
 		await _phase_delay();
 		_end_battle();

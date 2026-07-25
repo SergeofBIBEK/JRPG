@@ -67,26 +67,36 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _showing_confirm:
 		# Waiting for confirm/cancel on overwrite
 		if event.is_action_pressed("interact"):
+			AudioManager.play_sfx("menu_select");
 			_do_save(_selected_slot);
 			_showing_confirm = false;
-			get_viewport().set_input_as_handled();
+			var vp = get_viewport();
+			if vp: vp.set_input_as_handled();
 		elif event.is_action_pressed("interact2"):
+			AudioManager.play_sfx("menu_cancel");
 			_status_label.text = "";
 			_showing_confirm = false;
-			get_viewport().set_input_as_handled();
+			var vp = get_viewport();
+			if vp: vp.set_input_as_handled();
 		return;
 
 	if event.is_action_pressed("move_up"):
 		_selected_slot = wrapi(_selected_slot - 1, 0, SaveManager.MAX_SLOTS);
 		_update_slot_highlight();
-		get_viewport().set_input_as_handled();
+		AudioManager.play_sfx("menu_cursor");
+		var vp = get_viewport();
+		if vp: vp.set_input_as_handled();
 	elif event.is_action_pressed("move_down"):
 		_selected_slot = wrapi(_selected_slot + 1, 0, SaveManager.MAX_SLOTS);
 		_update_slot_highlight();
-		get_viewport().set_input_as_handled();
+		AudioManager.play_sfx("menu_cursor");
+		var vp = get_viewport();
+		if vp: vp.set_input_as_handled();
 	elif event.is_action_pressed("interact"):
+		AudioManager.play_sfx("menu_select");
 		_attempt_save(_selected_slot);
-		get_viewport().set_input_as_handled();
+		var vp = get_viewport();
+		if vp: vp.set_input_as_handled();
 
 func _attempt_save(slot: int) -> void:
 	if SaveManager.has_save(slot):
@@ -99,6 +109,7 @@ func _attempt_save(slot: int) -> void:
 func _do_save(slot: int) -> void:
 	var success = SaveManager.save_game(slot);
 	if success:
+		AudioManager.play_sfx("save_confirm");
 		_status_label.text = "Saved!";
 		_status_label.add_theme_color_override("font_color", Color(0.4, 0.9, 0.4));
 	else:

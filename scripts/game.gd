@@ -13,6 +13,7 @@ var current_map: Node2D;
 var current_map_path: String = "";
 var _battle_scene: BattleScene = null;
 var _battle_scene_packed: PackedScene = preload("res://scenes/battle/battle_scene.tscn");
+var _map_music: String = "town";
 
 func _ready() -> void:
 	Events.battle_requested.connect(_on_battle_requested);
@@ -28,6 +29,10 @@ func _ready() -> void:
 		_init_inventory();
 		_load_map(starting_map, "PlayerSpawn");
 		current_map_path = starting_map.resource_path;
+
+	# Start map music
+	_map_music = _get_map_music(current_map_path);
+	AudioManager.play_music(_map_music, 0.0);
 
 	# Wait for the scene tree to settle before fading in
 	await get_tree().process_frame;
@@ -100,6 +105,10 @@ func change_map(map_scene_path: String, spawn_location: String) -> void:
 	current_map_path = map_scene_path;
 	_load_map(map_scene, spawn_location);
 
+	# Update music for the new map
+	_map_music = _get_map_music(current_map_path);
+	AudioManager.play_music(_map_music);
+
 func _load_map(map_scene: PackedScene, spawn_location: String) -> void:
 	current_map = map_scene.instantiate();
 	map_container.add_child(current_map);
@@ -136,6 +145,7 @@ func _on_battle_requested() -> void:
 	player.process_mode = Node.PROCESS_MODE_DISABLED;
 	_battle_scene = _battle_scene_packed.instantiate() as BattleScene;
 	add_child(_battle_scene);
+	AudioManager.play_music("battle");
 	await fade_overlay.fade_in(fade_duration);
 
 func _on_battle_ended() -> void:
@@ -147,13 +157,24 @@ func _on_battle_ended() -> void:
 	map_container.visible = true;
 	player.visible = true;
 	player.process_mode = Node.PROCESS_MODE_INHERIT;
+	AudioManager.play_music(_map_music);
 	await fade_overlay.fade_in(fade_duration);
 	transition_manager._locked = false;
 
 func _on_return_to_title() -> void:
 	get_tree().paused = false;
+	AudioManager.stop_music(0.3);
 	# Clear manager state so title screen starts fresh
 	PartyManager.clear();
 	ItemManager.clear();
 	QuestManager.clear();
 	get_tree().change_scene_to_file("res://scenes/title_screen.tscn");
+
+func _get_map_music(map_path: String) -> String:
+	# Check if map root has a music_track property
+	if current_map and current_map is Map and current_map.music_track != "":
+		return current_map.music_track;
+	# Fallback: derive from path
+	if "room2" in map_path or "dungeon" in map_path:
+		return "dungeon";
+	return "town";

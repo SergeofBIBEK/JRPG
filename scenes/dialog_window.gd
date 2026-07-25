@@ -44,7 +44,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return;
 
 	if event.is_action_pressed("interact"):
-		get_viewport().set_input_as_handled();
+		AudioManager.play_sfx("dialog_advance");
+		var vp = get_viewport();
+		if vp: vp.set_input_as_handled();
 		_advance_page();
 
 func display_dialog(dialog_image: Texture2D, dialog_text: Array[String], dialog_name: String):

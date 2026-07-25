@@ -2,6 +2,7 @@ class_name Map;
 extends Node2D;
 
 @export var player_scene: PackedScene;
+@export var music_track: String = "town";
 
 @onready var player_spawn: Marker2D = $PlayerSpawn;
 

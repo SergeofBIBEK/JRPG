@@ -106,17 +106,25 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if event.is_action_pressed("move_up"):
 		_navigate(-1);
-		get_viewport().set_input_as_handled();
+		AudioManager.play_sfx("menu_cursor");
+		var vp = get_viewport();
+		if vp: vp.set_input_as_handled();
 	elif event.is_action_pressed("move_down"):
 		_navigate(1);
-		get_viewport().set_input_as_handled();
+		AudioManager.play_sfx("menu_cursor");
+		var vp = get_viewport();
+		if vp: vp.set_input_as_handled();
 	elif event.is_action_pressed("interact"):
+		AudioManager.play_sfx("menu_select");
 		_confirm_selection();
-		get_viewport().set_input_as_handled();
+		var vp = get_viewport();
+		if vp: vp.set_input_as_handled();
 	elif event.is_action_pressed("menu"):
 		if _in_item_menu:
+			AudioManager.play_sfx("menu_cancel");
 			_close_item_menu();
-			get_viewport().set_input_as_handled();
+			var vp = get_viewport();
+			if vp: vp.set_input_as_handled();
 
 func _navigate(direction: int) -> void:
 	if _in_item_menu:
